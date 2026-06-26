@@ -1,10 +1,10 @@
-import { useStoreInfo } from "../hooks/useStoreInfo"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { toast } from "sonner"
+import { useStoreStore } from "../store/storeInfoStore"
 import {
   Store,
   RefreshCw,
@@ -16,22 +16,30 @@ import { Link } from "react-router-dom"
 
 export function TestDashboard() {
   const navigate = useNavigate()
-  const { storeInfo, loading, error, refetch, storeId } = useStoreInfo()
+  const [searchParams] = useSearchParams()
+  const storeId = searchParams.get("store_id") ?? undefined
+  const demoPlatform = searchParams.get("demo") ?? searchParams.get("platform") ?? undefined
+
+  const { storeInfo, loading, error, fetchStoreInfo } = useStoreStore()
 
   useEffect(() => {
-    if (!loading) {
-      if (!storeId) {
-        toast.error("عذراً، يجب عليك مزامنة متجر سلة أو زد أولاً للوصول للوحة التحكم.")
-        navigate("/connect", { replace: true })
-      } else if (error) {
-        toast.error(`فشل الاتصال بالمتجر: ${error}`)
-        navigate("/connect", { replace: true })
-      }
+    if (!storeId) {
+      toast.error("عذراً، يجب عليك مزامنة متجر سلة أو زد أولاً للوصول للوحة التحكم.")
+      navigate("/connect", { replace: true })
+    } else {
+      fetchStoreInfo(storeId, demoPlatform)
     }
-  }, [loading, storeId, error, navigate])
+  }, [storeId, demoPlatform, navigate, fetchStoreInfo])
+
+  useEffect(() => {
+    if (error) {
+      toast.error(`فشل الاتصال بالمتجر: ${error}`)
+      navigate("/connect", { replace: true })
+    }
+  }, [error, navigate])
 
   const handleSync = async () => {
-    await refetch()
+    await fetchStoreInfo(storeId, demoPlatform)
     toast.success("تم تحديث ومزامنة بيانات المتجر بنجاح!")
   }
 
@@ -75,7 +83,7 @@ export function TestDashboard() {
           <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-semibold flex items-center gap-3">
             <AlertCircle className="size-5 shrink-0" />
             <p className="grow leading-relaxed">{error}</p>
-            <Button variant="outline" onClick={refetch} className="rounded-xl border-destructive/20 hover:bg-destructive/20 text-destructive font-bold text-xs shrink-0 cursor-pointer">
+            <Button variant="outline" onClick={handleSync} className="rounded-xl border-destructive/20 hover:bg-destructive/20 text-destructive font-bold text-xs shrink-0 cursor-pointer">
               إعادة المحاولة
             </Button>
           </div>

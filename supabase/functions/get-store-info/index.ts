@@ -123,7 +123,9 @@ serve(async (req: Request) => {
         storeInfo = {
           storeName: d?.merchant?.name ?? d?.name ?? d?.store?.name ?? "متجر سلة",
           logoUrl: d?.merchant?.avatar ?? d?.avatar ?? d?.store?.logo ?? "",
-          description: d?.merchant?.description ?? d?.bio ?? d?.store?.description ?? "متجر على منصة سلة",
+          description: d?.merchant?.domain 
+            ? `متجر إلكتروني نشط على منصة سلة. رابط المتجر: https://${d.merchant.domain}` 
+            : "متجر إلكتروني نشط على منصة سلة",
           platform: "salla",
           syncStatus: "synced",
           managerEmail: d?.email ?? "",
@@ -132,29 +134,85 @@ serve(async (req: Request) => {
         throw new Error("فشل جلب بيانات المتجر من سلة")
       }
     } else if (storeData.platform === "zid") {
-      // جلب من API زد
-      const zidRes = await fetch("https://api.zid.sa/v1/managers/me", {
+      // 1. جلب البيانات الأساسية للمتجر
+      console.log("جلب البيانات الأساسية من زد عبر /v1/managers/account/store...")
+      const storeRes = await fetch("https://api.zid.sa/v1/managers/account/store", {
         headers: {
-          Authorization: access_token,
+          Authorization: access_token.startsWith("Bearer ") ? access_token : `Bearer ${access_token}`,
           "X-Manager-Token": manager_token ?? "",
           "X-App-Id": Deno.env.get("ZID_CLIENT_ID") ?? "",
           "Content-Type": "application/json",
         },
       })
 
-      if (zidRes.ok) {
-        const zidData = await zidRes.json()
-        const store = zidData?.store ?? zidData?.manager?.store ?? {}
-        storeInfo = {
-          storeName: store?.name?.ar ?? store?.name ?? "متجر زد",
-          logoUrl: store?.logo ?? store?.avatar ?? "",
-          description: store?.description?.ar ?? store?.description ?? "متجر على منصة زد",
-          platform: "zid",
-          syncStatus: "synced",
-          managerEmail: zidData?.email ?? "",
-        }
-      } else {
+      if (!storeRes.ok) {
+        const errorText = await storeRes.text()
+        console.error("فشل جلب بيانات المتجر الأساسية من زد:", errorText)
         throw new Error("فشل جلب بيانات المتجر من زد")
+      }
+
+      const storeResText = await storeRes.text()
+      let storeDataJson
+      try {
+        storeDataJson = JSON.parse(storeResText)
+      } catch (e) {
+        console.error("فشل تحليل استجابة معلومات المتجر كـ JSON في get-store-info. الاستجابة كانت:", storeResText.substring(0, 1000))
+        throw new Error("استجابة غير صالحة من زد (ليست JSON)")
+      }
+      const store = storeDataJson?.data ?? storeDataJson?.store ?? {}
+      
+      // 2. محاولة جلب شعار المتجر (branding) كخطوة اختيارية
+      let logoUrl = ""
+      try {
+        console.log("جلب هوية المتجر والشعار عبر /v1/managers/account/store/branding...")
+        const brandingRes = await fetch("https://api.zid.sa/v1/managers/account/store/branding", {
+          headers: {
+            Authorization: access_token.startsWith("Bearer ") ? access_token : `Bearer ${access_token}`,
+            "X-Manager-Token": manager_token ?? "",
+            "X-App-Id": Deno.env.get("ZID_CLIENT_ID") ?? "",
+            "Content-Type": "application/json",
+          },
+        })
+        if (brandingRes.ok) {
+          const brandingData = await brandingRes.json()
+          logoUrl = brandingData?.data?.logo?.url ?? brandingData?.logo?.url ?? ""
+        }
+      } catch (brandingErr) {
+        console.warn("فشل اختياري لجلب الشعار:", brandingErr)
+      }
+
+      // 3. محاولة جلب البريد الإلكتروني للمدير كخطوة اختيارية
+      let managerEmail = ""
+      try {
+        const profileRes = await fetch("https://api.zid.sa/v1/managers/account/profile", {
+          headers: {
+            Authorization: access_token.startsWith("Bearer ") ? access_token : `Bearer ${access_token}`,
+            "X-Manager-Token": manager_token ?? "",
+            "X-App-Id": Deno.env.get("ZID_CLIENT_ID") ?? "",
+            "Content-Type": "application/json",
+          },
+        })
+        if (profileRes.ok) {
+          const profileData = await profileRes.json()
+          const user = profileData?.user ?? profileData?.profile ?? {}
+          managerEmail = user?.email ?? user?.username ?? ""
+        }
+      } catch (profileErr) {
+        console.warn("فشل اختياري لجلب البريد الإلكتروني للمدير:", profileErr)
+      }
+
+      const domain = store?.domain ?? ""
+      const storeUrl = store?.url ?? (domain ? `https://${domain}` : "")
+      
+      storeInfo = {
+        storeName: store?.title ?? store?.name?.ar ?? store?.name?.en ?? store?.name ?? "متجر زد",
+        logoUrl: logoUrl,
+        description: storeUrl 
+          ? `متجر إلكتروني نشط على منصة زد. رابط المتجر: ${storeUrl}` 
+          : "متجر إلكتروني نشط على منصة زد",
+        platform: "zid",
+        syncStatus: "synced",
+        managerEmail: managerEmail || store?.email || "",
       }
     }
 

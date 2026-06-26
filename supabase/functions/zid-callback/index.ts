@@ -50,21 +50,35 @@ serve(async (req: Request) => {
     }
 
     const tokenData = await tokenResponse.json()
-    // زد يرجع: authorization (هو access_token) وتوكن المدير (manager token)
-    const access_token = tokenData?.authorization ?? tokenData?.access_token
-    const manager_token = tokenData?.manager?.token ?? tokenData?.manager_token ?? null
+    console.log("المفاتيح الموجودة في استجابة التوكن:", Object.keys(tokenData))
+    if (tokenData.manager) {
+      console.log("مفاتيح كائن manager:", Object.keys(tokenData.manager))
+    }
+
+    // في منصة زد:
+    // 1. tokenData.authorization هو توكن التحقق العام (Authorization)
+    // 2. tokenData.access_token هو توكن المدير الخاص بالمتجر (X-Manager-Token)
+    const access_token = tokenData?.authorization || tokenData?.access_token
+    const manager_token = tokenData?.access_token || tokenData?.manager?.token || tokenData?.manager_token || null
     const expires_in = tokenData?.expires_in ?? 3600
 
     if (!access_token) {
-      throw new Error("لم يُرجع خادم زد access_token")
+      throw new Error("لم يُرجع خادم زد access_token/authorization")
     }
 
     // ══════════════════════════════════════
     // الخطوة 2: جلب معلومات المتجر من زد
     // ══════════════════════════════════════
-    const storeInfoResponse = await fetch("https://api.zid.sa/v1/managers/me", {
+    console.log("جلب معلومات المتجر من زد عبر /v1/managers/account/store...")
+    
+    // طباعة الرؤوس بشكل آمن للتشخيص
+    console.log("رأس Authorization المرسل:", access_token ? `${access_token.substring(0, 15)}...` : "فارغ")
+    console.log("رأس X-Manager-Token المرسل:", manager_token ? `${manager_token.substring(0, 15)}...` : "فارغ")
+    console.log("رأس X-App-Id المرسل:", Deno.env.get("ZID_CLIENT_ID") ? `${Deno.env.get("ZID_CLIENT_ID")}` : "فارغ")
+
+    const storeInfoResponse = await fetch("https://api.zid.sa/v1/managers/account/store", {
       headers: {
-        Authorization: access_token,
+        Authorization: access_token.startsWith("Bearer ") ? access_token : `Bearer ${access_token}`,
         "X-Manager-Token": manager_token ?? "",
         "X-App-Id": Deno.env.get("ZID_CLIENT_ID") ?? "",
         "Content-Type": "application/json",
@@ -72,12 +86,28 @@ serve(async (req: Request) => {
     })
 
     if (!storeInfoResponse.ok) {
+      const errorText = await storeInfoResponse.text()
+      console.error("فشل جلب معلومات المتجر من زد. الحالة:", storeInfoResponse.status, "الاستجابة:", errorText)
       throw new Error("فشل جلب معلومات المتجر من زد")
     }
 
-    const storeInfoData = await storeInfoResponse.json()
+    const storeInfoResponseText = await storeInfoResponse.text()
+    console.log("الاستجابة الخام من زد:", storeInfoResponseText.substring(0, 200))
+
+    let storeInfoData
+    try {
+      storeInfoData = JSON.parse(storeInfoResponseText)
+    } catch (e) {
+      const diag = `مفاتيح التوكن: ${JSON.stringify(Object.keys(tokenData))}, Auth: ${access_token ? access_token.substring(0, 15) : "فارغ"}, ManagerToken: ${manager_token ? manager_token.substring(0, 15) : "فارغ"}`
+      console.error("فشل تحليل استجابة معلومات المتجر كـ JSON. الاستجابة البدئية كانت:", storeInfoResponseText.substring(0, 1000))
+      throw new Error(`استجابة غير صالحة من زد (ليست JSON) - تشخيص: ${diag}`)
+    }
+
+    console.log("معلومات المتجر المُسترجعة:", JSON.stringify(storeInfoData))
+
+    const store = storeInfoData?.data ?? storeInfoData?.store ?? {}
     const platformStoreId = String(
-      storeInfoData?.store?.id ??
+      store?.id ??
       storeInfoData?.manager?.store_id ??
       "unknown"
     )
