@@ -1,4 +1,3 @@
-import { Layers, Sparkles } from "lucide-react"
 
 export function ConnectHeader() {
   return (

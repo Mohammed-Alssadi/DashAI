@@ -6,7 +6,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import {
   Store,
   RefreshCw,
-  CheckCircle2,
   Package,
   ShoppingCart,
   TrendingUp,
@@ -16,10 +15,9 @@ import {
   ArrowUpRight,
   AlertCircle
 } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 export function TestDashboard() {
-  const navigate = useNavigate()
   // سنقوم باستدعاء البيانات الحية للمتجر (سيتم استخدام البيانات التجريبية تلقائياً في حال لم يكن الاتصال بالـ Edge Function جاهزاً بعد)
   const { storeInfo, loading, error, refetch } = useStoreInfo()
 

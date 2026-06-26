@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { useSearchParams } from "react-router-dom"
-import { dashboardService, StoreDetails } from "../services/dashboardService"
+import { dashboardService, type StoreDetails } from "../services/dashboardService"
 
 export function useStoreInfo() {
   const [searchParams] = useSearchParams()
