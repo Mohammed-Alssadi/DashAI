@@ -55,7 +55,7 @@ serve(async (req: Request) => {
     // ══════════════════════════════════════
     // الخطوة 2: جلب معرّف المتجر من سلة
     // ══════════════════════════════════════
-    const storeInfoResponse = await fetch("https://api.salla.dev/admin/v2/user/info", {
+    const storeInfoResponse = await fetch("https://accounts.salla.sa/oauth2/user/info", {
       headers: {
         Authorization: `Bearer ${access_token}`,
         "Content-Type": "application/json",
@@ -67,7 +67,12 @@ serve(async (req: Request) => {
     }
 
     const storeInfoData = await storeInfoResponse.json()
-    const platformStoreId = String(storeInfoData?.data?.id ?? storeInfoData?.id ?? "unknown")
+    const platformStoreId = String(
+      storeInfoData?.data?.merchant?.id ?? 
+      storeInfoData?.data?.id ?? 
+      storeInfoData?.id ?? 
+      "unknown"
+    )
 
     // ══════════════════════════════════════
     // الخطوة 3: حفظ البيانات في Supabase

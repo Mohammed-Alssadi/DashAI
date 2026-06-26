@@ -1,7 +1,6 @@
 import { useStoreInfo } from "../hooks/useStoreInfo"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -9,13 +8,8 @@ import { toast } from "sonner"
 import {
   Store,
   RefreshCw,
-  Package,
-  ShoppingCart,
-  TrendingUp,
   ArrowRight,
   Layers,
-  Sparkles,
-  ArrowUpRight,
   AlertCircle
 } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -37,8 +31,8 @@ export function TestDashboard() {
   }, [loading, storeId, error, navigate])
 
   const handleSync = async () => {
-    // محاكاة إعادة المزامنة وجلب البيانات الحية
     await refetch()
+    toast.success("تم تحديث ومزامنة بيانات المتجر بنجاح!")
   }
 
   return (
@@ -51,8 +45,8 @@ export function TestDashboard() {
       <div className="absolute bottom-[5%] right-[10%] w-[350px] md:w-[600px] h-[350px] md:h-[600px] rounded-full bg-accent/25 blur-[100px] md:blur-[150px] pointer-events-none" />
 
       {/* Navigation Header */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-6 h-20 flex items-center justify-between border-b border-border/60 backdrop-blur-md bg-background/40">
-        <div className="flex items-center gap-2">
+      <header className="relative z-10 w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-border/40 backdrop-blur-md bg-background/60">
+        <div className="flex items-center gap-3">
           <div className="size-9 rounded-xl bg-gradient-to-tr from-primary to-primary/80 flex items-center justify-center shadow-md shadow-primary/20">
             <Layers className="size-5 text-primary-foreground" />
           </div>
@@ -60,7 +54,7 @@ export function TestDashboard() {
             DashAI
           </span>
           <Badge variant="outline" className="hidden sm:inline-flex border-border/80 text-muted-foreground text-xs rounded-lg px-2 py-0.5">
-            لوحة تحكم التجربة
+            لوحة تحكم المتجر
           </Badge>
         </div>
         <div className="flex items-center gap-3">
@@ -153,7 +147,7 @@ export function TestDashboard() {
                   </div>
                   
                   <p className="text-muted-foreground text-sm max-w-2xl leading-relaxed font-medium">
-                    {storeInfo.description}
+                    {storeInfo.description || "لا يوجد وصف متوفر للمتجر."}
                   </p>
                 </div>
               </div>
@@ -177,142 +171,6 @@ export function TestDashboard() {
               </Button>
             </div>
           )}
-        </section>
-
-        {/* Analytics & Performance Cards Section */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Card 1: Products Count */}
-          <Card className="border-border/60 bg-card/60 backdrop-blur-sm shadow-sm rounded-2xl overflow-hidden relative">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div className="space-y-1">
-                <CardDescription className="text-xs font-bold text-muted-foreground">عدد المنتجات النشطة</CardDescription>
-                <CardTitle className="text-3xl font-black text-foreground">148</CardTitle>
-              </div>
-              <div className="size-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <Package className="size-5" />
-              </div>
-            </CardHeader>
-            <CardContent className="pb-4">
-              <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
-                <ArrowUpRight className="size-3.5" />
-                <span>+12% هذا الشهر</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Card 2: Total Orders */}
-          <Card className="border-border/60 bg-card/60 backdrop-blur-sm shadow-sm rounded-2xl overflow-hidden relative">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div className="space-y-1">
-                <CardDescription className="text-xs font-bold text-muted-foreground">الطلبات المكتملة</CardDescription>
-                <CardTitle className="text-3xl font-black text-foreground">843</CardTitle>
-              </div>
-              <div className="size-11 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-650">
-                <ShoppingCart className="size-5" />
-              </div>
-            </CardHeader>
-            <CardContent className="pb-4">
-              <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
-                <ArrowUpRight className="size-3.5" />
-                <span>+8% هذا الأسبوع</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Card 3: Live Sales Trend */}
-          <Card className="border-border/60 bg-card/60 backdrop-blur-sm shadow-sm rounded-2xl overflow-hidden relative">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div className="space-y-1">
-                <CardDescription className="text-xs font-bold text-muted-foreground">إجمالي المبيعات المزامنة</CardDescription>
-                <CardTitle className="text-3xl font-black text-foreground">12,450 ر.س</CardTitle>
-              </div>
-              <div className="size-11 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-600">
-                <TrendingUp className="size-5" />
-              </div>
-            </CardHeader>
-            <CardContent className="pb-4">
-              <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
-                <ArrowUpRight className="size-3.5" />
-                <span>+15% منذ الربط</span>
-              </div>
-            </CardContent>
-          </Card>
-
-        </section>
-
-        {/* Demo Products Preview Section */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-                <span>المنتجات المزامنة حياً</span>
-                <Sparkles className="size-4 text-primary animate-pulse" />
-              </h3>
-              <p className="text-muted-foreground text-xs font-medium">قائمة تفاعلية بالمنتجات التي تم قراءتها من متجرك بالخلفية</p>
-            </div>
-            <Badge variant="outline" className="border-border/80 font-bold py-1 px-3 text-muted-foreground">
-              مجموعات البيانات: 3 منتجات تجريبية
-            </Badge>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* Product Item 1 */}
-            <Card className="border-border/50 bg-card/50 hover:bg-card hover:border-primary/20 hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden group">
-              <div className="aspect-video w-full bg-accent/40 flex items-center justify-center relative overflow-hidden">
-                <Store className="size-8 text-muted-foreground opacity-40 group-hover:scale-110 transition-transform duration-300" />
-                <Badge className="absolute top-3 right-3 bg-foreground/5 backdrop-blur-md border border-border text-foreground hover:bg-foreground/5 rounded-lg text-xs font-bold">
-                  سعر مألوف
-                </Badge>
-              </div>
-              <CardHeader className="p-4 space-y-1">
-                <CardTitle className="text-base font-bold text-foreground">قميص قطني كلاسيكي عالي الجودة</CardTitle>
-                <CardDescription className="text-xs text-muted-foreground font-medium line-clamp-1">وصف المنتج القصير المستورد من المتجر</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0 flex items-center justify-between">
-                <span className="font-extrabold text-sm text-primary">120 ر.س</span>
-                <span className="text-xs font-semibold text-muted-foreground">الكمية: 42 وحدة</span>
-              </CardContent>
-            </Card>
-
-            {/* Product Item 2 */}
-            <Card className="border-border/50 bg-card/50 hover:bg-card hover:border-primary/20 hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden group">
-              <div className="aspect-video w-full bg-accent/40 flex items-center justify-center relative overflow-hidden">
-                <Store className="size-8 text-muted-foreground opacity-40 group-hover:scale-110 transition-transform duration-300" />
-                <Badge className="absolute top-3 right-3 bg-foreground/5 backdrop-blur-md border border-border text-foreground hover:bg-foreground/5 rounded-lg text-xs font-bold">
-                  الأكثر مبيعاً
-                </Badge>
-              </div>
-              <CardHeader className="p-4 space-y-1">
-                <CardTitle className="text-base font-bold text-foreground">حذاء رياضي مريح للجري والمشي</CardTitle>
-                <CardDescription className="text-xs text-muted-foreground font-medium line-clamp-1">توسيد فائق ووزن خفيف لتوفير راحة مثالية طوال اليوم</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0 flex items-center justify-between">
-                <span className="font-extrabold text-sm text-primary">280 ر.س</span>
-                <span className="text-xs font-semibold text-muted-foreground">الكمية: 15 وحدة</span>
-              </CardContent>
-            </Card>
-
-            {/* Product Item 3 */}
-            <Card className="border-border/50 bg-card/50 hover:bg-card hover:border-primary/20 hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden group">
-              <div className="aspect-video w-full bg-accent/40 flex items-center justify-center relative overflow-hidden">
-                <Store className="size-8 text-muted-foreground opacity-40 group-hover:scale-110 transition-transform duration-300" />
-                <Badge className="absolute top-3 right-3 bg-foreground/5 backdrop-blur-md border border-border text-foreground hover:bg-foreground/5 rounded-lg text-xs font-bold">
-                  جديد بالمتجر
-                </Badge>
-              </div>
-              <CardHeader className="p-4 space-y-1">
-                <CardTitle className="text-base font-bold text-foreground">ساعة ذكية مضادة للماء بمستشعرات رياضية</CardTitle>
-                <CardDescription className="text-xs text-muted-foreground font-medium line-clamp-1">تتبع نبضات القلب والأنشطة اليومية بدقة فائقة وشاشة OLED</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0 flex items-center justify-between">
-                <span className="font-extrabold text-sm text-primary">350 ر.س</span>
-                <span className="text-xs font-semibold text-muted-foreground">الكمية: 8 وحدات</span>
-              </CardContent>
-            </Card>
-
-          </div>
         </section>
 
       </main>

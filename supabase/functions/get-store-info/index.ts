@@ -110,7 +110,7 @@ serve(async (req: Request) => {
 
     if (storeData.platform === "salla") {
       // جلب من API سلة
-      const sallaRes = await fetch("https://api.salla.dev/admin/v2/user/info", {
+      const sallaRes = await fetch("https://accounts.salla.sa/oauth2/user/info", {
         headers: {
           Authorization: `Bearer ${access_token}`,
           "Content-Type": "application/json",
@@ -121,9 +121,9 @@ serve(async (req: Request) => {
         const sallaData = await sallaRes.json()
         const d = sallaData?.data ?? sallaData
         storeInfo = {
-          storeName: d?.name ?? d?.store?.name ?? "متجر سلة",
-          logoUrl: d?.avatar ?? d?.store?.logo ?? "",
-          description: d?.bio ?? d?.store?.description ?? "متجر على منصة سلة",
+          storeName: d?.merchant?.name ?? d?.name ?? d?.store?.name ?? "متجر سلة",
+          logoUrl: d?.merchant?.avatar ?? d?.avatar ?? d?.store?.logo ?? "",
+          description: d?.merchant?.description ?? d?.bio ?? d?.store?.description ?? "متجر على منصة سلة",
           platform: "salla",
           syncStatus: "synced",
           managerEmail: d?.email ?? "",
