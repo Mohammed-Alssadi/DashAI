@@ -1,36 +1,38 @@
 import { Button } from "@/components/ui/button"
 import { ShoppingBag, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
-
-// بناء رابط OAuth الحقيقي لمنصة زد
-function buildZidOAuthUrl(): string {
-  const clientId = import.meta.env.VITE_ZID_CLIENT_ID
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-
-  // إذا المفاتيح غير موجودة بعد → وضع المعاينة
-  if (!clientId || clientId === "PASTE_YOUR_ZID_CLIENT_ID_HERE") {
-    return ""
-  }
-
-  const params = new URLSearchParams({
-    client_id: clientId,
-    redirect_uri: `${supabaseUrl}/functions/v1/zid-callback`,
-    response_type: "code",
-    state: Math.random().toString(36).substring(2, 15),
-  })
-
-  return `https://oauth.zid.sa/oauth/authorize?${params.toString()}`
-}
+import { supabase } from "@/lib/supabase/client"
 
 export function ZidConnectButton() {
-  const oauthUrl = buildZidOAuthUrl()
-  const isDemoMode = !oauthUrl
+  const isDemoMode = !import.meta.env.VITE_ZID_CLIENT_ID || import.meta.env.VITE_ZID_CLIENT_ID === "PASTE_YOUR_ZID_CLIENT_ID_HERE"
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (isDemoMode) {
       toast.error("يرجى إنشاء تطبيق في شركاء زد وضبط مفتاح Client ID في ملف .env للربط الحقيقي.")
-    } else {
-      window.location.href = oauthUrl
+      return
+    }
+
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error || !session) {
+        toast.error("يرجى تسجيل الدخول أولاً للتمكن من ربط متجرك.")
+        return
+      }
+
+      const clientId = import.meta.env.VITE_ZID_CLIENT_ID
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+
+      const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: `${supabaseUrl}/functions/v1/zid-callback`,
+        response_type: "code",
+        state: session.user.id, // تمرير معرف المستخدم كمعلمة للحالة
+      })
+
+      window.location.href = `https://oauth.zid.sa/oauth/authorize?${params.toString()}`
+    } catch (err) {
+      console.error(err)
+      toast.error("حدث خطأ غير متوقع أثناء الاتصال بالمنصة.")
     }
   }
 

@@ -12,7 +12,7 @@ export function useAuth() {
     setError(null)
     try {
       await authService.loginMerchant(email, password)
-      navigate("/connect") // التوجيه لصفحة الربط فور نجاح الدخول
+      navigate("/dashboard") // التوجيه للوحة المتاجر فور نجاح الدخول
     } catch (err: any) {
       setError(err.message || "حدث خطأ أثناء تسجيل الدخول")
       throw err

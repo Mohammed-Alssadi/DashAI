@@ -8,7 +8,7 @@
 -- ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS linked_stores (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id           UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id           UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   platform          VARCHAR(10) NOT NULL CHECK (platform IN ('salla', 'zid')),
   platform_store_id VARCHAR(100) NOT NULL,
   created_at        TIMESTAMPTZ DEFAULT NOW() NOT NULL,
@@ -40,13 +40,13 @@ ALTER TABLE store_tokens  ENABLE ROW LEVEL SECURITY;
 -- الدوال السحابية (Service Role) تتجاوز RLS تلقائياً
 -- ─────────────────────────────────────────
 CREATE POLICY "user_owns_store" ON linked_stores
-  FOR ALL USING (auth.uid() = user_id OR user_id IS NULL);
+  FOR ALL USING (auth.uid() = user_id);
 
 CREATE POLICY "user_owns_store_tokens" ON store_tokens
   FOR ALL USING (
     store_id IN (
       SELECT id FROM linked_stores
-      WHERE user_id = auth.uid() OR user_id IS NULL
+      WHERE user_id = auth.uid()
     )
   );
 

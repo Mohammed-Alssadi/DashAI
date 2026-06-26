@@ -1,8 +1,27 @@
 import { Button } from "@/components/ui/button"
 import { Sparkles, ArrowLeft, ShieldCheck, Zap, BarChart3, Layers } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase/client"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function WelcomeHero() {
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
+
   return (
     <div className="relative min-h-screen w-full bg-background text-foreground overflow-hidden font-sans selection:bg-accent selection:text-accent-foreground">
       {/* Background Grid Pattern (Uses global border color opacity) */}
@@ -23,12 +42,33 @@ export function WelcomeHero() {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground hover:bg-accent/50 text-sm cursor-pointer rounded-xl font-medium">
-            <Link to="/connect">تسجيل الدخول</Link>
-          </Button>
-          <Button variant="default" asChild className="shadow-md shadow-primary/10 text-sm cursor-pointer rounded-xl px-4 font-medium">
-            <Link to="/connect">اربط متجرك الآن</Link>
-          </Button>
+          {user ? (
+            <>
+              <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground hover:bg-accent/50 text-sm cursor-pointer rounded-xl font-medium">
+                <Link to="/dashboard">لوحة التحكم</Link>
+              </Button>
+              <div className="flex items-center gap-2 border border-border/80 pl-4 pr-2 py-1 rounded-2xl bg-background/50">
+                <Avatar className="size-8 rounded-lg border border-border">
+                  <AvatarImage src={user.user_metadata?.avatar_url} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs rounded-lg uppercase">
+                    {user.email?.substring(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-xs font-semibold text-foreground/80">
+                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground hover:bg-accent/50 text-sm cursor-pointer rounded-xl font-medium">
+                <Link to="/login">تسجيل الدخول</Link>
+              </Button>
+              <Button variant="default" asChild className="shadow-md shadow-primary/10 text-sm cursor-pointer rounded-xl px-4 font-medium">
+                <Link to="/connect">اربط متجرك الآن</Link>
+              </Button>
+            </>
+          )}
         </div>
       </header>
 

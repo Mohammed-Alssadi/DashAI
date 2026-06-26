@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { PageLoader } from "@/components/PageLoader"
+import { ProtectedRoute } from "@/components/ProtectedRoute"
 import { Toaster } from "sonner"
 
 // Load Pages lazily on request
@@ -31,22 +32,6 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/connect",
-    element: (
-      <Suspense fallback={<PageLoader />}>
-        <ConnectPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: "/dashboard",
-    element: (
-      <Suspense fallback={<PageLoader />}>
-        <TestDashboard />
-      </Suspense>
-    ),
-  },
-  {
     path: "/login",
     element: (
       <Suspense fallback={<PageLoader />}>
@@ -61,6 +46,27 @@ const router = createBrowserRouter([
         <RegisterPage />
       </Suspense>
     ),
+  },
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/connect",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ConnectPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <TestDashboard />
+          </Suspense>
+        ),
+      },
+    ],
   },
 ])
 

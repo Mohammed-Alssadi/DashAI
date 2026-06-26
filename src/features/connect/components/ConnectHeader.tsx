@@ -1,21 +1,24 @@
 
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase/client"
+
 export function ConnectHeader() {
+  const [userName, setUserName] = useState("")
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        const name = user.user_metadata?.full_name || user.email?.split("@")[0] || ""
+        setUserName(name)
+      }
+    })
+  }, [])
+
   return (
     <div className="flex flex-col items-center text-center space-y-2">
-      {/* Brand Icon */}
-      {/* <div className="size-12 rounded-2xl bg-gradient-to-tr from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/10">
-        <Layers className="size-6 text-primary-foreground" />
-      </div> */}
-      
-      {/* Platform Title Badge */}
-      {/* <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent border border-border text-accent-foreground text-xs font-semibold">
-        <Sparkles className="size-3 text-primary" />
-        <span>ربط لوحة التحكم الموحدة</span>
-      </div> */}
-
-      {/* Main Headers */}
+      {/* Main Headers with personalized greeting */}
       <p className="text-2xl md:text-4xl font-black tracking-tight text-foreground pb-5">
-        أهلاً بك في DashAI 👋
+        أهلاً بك {userName ? `يا ${userName}` : ""} في DashAI 👋
       </p>
       
       <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-sm">
