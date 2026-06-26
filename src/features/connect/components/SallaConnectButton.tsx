@@ -18,6 +18,7 @@ function buildSallaOAuthUrl(): string {
     redirect_uri: `${supabaseUrl}/functions/v1/salla-callback`,
     response_type: "code",
     scope: "offline_access",
+    state: Math.random().toString(36).substring(2, 15),
   })
 
   return `https://accounts.salla.sa/oauth2/auth?${params.toString()}`

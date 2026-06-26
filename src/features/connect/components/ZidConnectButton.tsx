@@ -16,6 +16,7 @@ function buildZidOAuthUrl(): string {
     client_id: clientId,
     redirect_uri: `${supabaseUrl}/functions/v1/zid-callback`,
     response_type: "code",
+    state: Math.random().toString(36).substring(2, 15),
   })
 
   return `https://oauth.zid.sa/oauth/authorize?${params.toString()}`
