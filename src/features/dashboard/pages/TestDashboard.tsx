@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 import {
   Store,
   RefreshCw,
@@ -18,8 +21,20 @@ import {
 import { Link } from "react-router-dom"
 
 export function TestDashboard() {
-  // سنقوم باستدعاء البيانات الحية للمتجر (سيتم استخدام البيانات التجريبية تلقائياً في حال لم يكن الاتصال بالـ Edge Function جاهزاً بعد)
-  const { storeInfo, loading, error, refetch } = useStoreInfo()
+  const navigate = useNavigate()
+  const { storeInfo, loading, error, refetch, storeId } = useStoreInfo()
+
+  useEffect(() => {
+    if (!loading) {
+      if (!storeId) {
+        toast.error("عذراً، يجب عليك مزامنة متجر سلة أو زد أولاً للوصول للوحة التحكم.")
+        navigate("/connect", { replace: true })
+      } else if (error) {
+        toast.error(`فشل الاتصال بالمتجر: ${error}`)
+        navigate("/connect", { replace: true })
+      }
+    }
+  }, [loading, storeId, error, navigate])
 
   const handleSync = async () => {
     // محاكاة إعادة المزامنة وجلب البيانات الحية

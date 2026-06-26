@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { PageLoader } from "@/components/PageLoader"
+import { Toaster } from "sonner"
 
 // Load Pages lazily on request
 const WelcomePage = lazy(() =>
@@ -66,6 +67,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
+      <Toaster position="top-center" richColors />
       <RouterProvider router={router} />
     </div>
   )

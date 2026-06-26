@@ -8,5 +8,3 @@ port = 54322
 [auth]
 enabled = true
 
-[functions]
-enabled = true

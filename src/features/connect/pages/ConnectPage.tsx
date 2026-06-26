@@ -3,11 +3,32 @@ import { SallaConnectButton } from "../components/SallaConnectButton"
 import { ZidConnectButton } from "../components/ZidConnectButton"
 import { OAuthNotice } from "../components/OAuthNotice"
 import { ConnectFooter } from "../components/ConnectFooter"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { ArrowRight } from "lucide-react"
+import { useEffect } from "react"
+import { toast } from "sonner"
 
 export function ConnectPage() {
-  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    const error = searchParams.get("error")
+    if (error) {
+      if (error === "salla_denied") {
+        toast.error("تم إلغاء عملية الربط مع سلة من قبل المستخدم.")
+      } else if (error === "zid_denied") {
+        toast.error("تم إلغاء عملية الربط مع زد من قبل المستخدم.")
+      } else {
+        toast.error("فشل الاتصال بالمنصة. يرجى المحاولة مرة أخرى.")
+      }
+
+      // تنظيف معلمات البحث لتجنب تكرار الرسالة عند التحديث
+      const newParams = new URLSearchParams(searchParams)
+      newParams.delete("error")
+      setSearchParams(newParams, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
+
   return (
     <div className="relative min-h-screen w-full bg-background flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden font-sans">
       
@@ -33,8 +54,8 @@ export function ConnectPage() {
 
         {/* Integration Buttons */}
         <div className="space-y-4">
-          <SallaConnectButton onClick={() => navigate("/dashboard")} />
-          <ZidConnectButton onClick={() => navigate("/dashboard")} />
+          <SallaConnectButton />
+          <ZidConnectButton />
         </div>
 
         {/* Security Info Notice */}

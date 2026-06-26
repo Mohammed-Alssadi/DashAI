@@ -1,18 +1,15 @@
 import { Button } from "@/components/ui/button"
 import { ShoppingBag, ArrowLeft } from "lucide-react"
-
-interface ZidConnectButtonProps {
-  onClick?: () => void
-}
+import { toast } from "sonner"
 
 // بناء رابط OAuth الحقيقي لمنصة زد
 function buildZidOAuthUrl(): string {
   const clientId = import.meta.env.VITE_ZID_CLIENT_ID
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
-  // إذا المفاتيح غير موجودة بعد → نوجه للـ /dashboard مؤقتاً كمعاينة
+  // إذا المفاتيح غير موجودة بعد → وضع المعاينة
   if (!clientId || clientId === "PASTE_YOUR_ZID_CLIENT_ID_HERE") {
-    return "/dashboard?demo=zid"
+    return ""
   }
 
   const params = new URLSearchParams({
@@ -24,16 +21,14 @@ function buildZidOAuthUrl(): string {
   return `https://oauth.zid.sa/oauth/authorize?${params.toString()}`
 }
 
-export function ZidConnectButton({ onClick }: ZidConnectButtonProps) {
+export function ZidConnectButton() {
   const oauthUrl = buildZidOAuthUrl()
-  const isDemoMode = oauthUrl.startsWith("/dashboard")
+  const isDemoMode = !oauthUrl
 
   const handleClick = () => {
     if (isDemoMode) {
-      // وضع المعاينة: توجيه داخلي
-      onClick?.()
+      toast.error("يرجى إنشاء تطبيق في شركاء زد وضبط مفتاح Client ID في ملف .env للربط الحقيقي.")
     } else {
-      // وضع الإنتاج: توجيه للمنصة الخارجية للمصادقة
       window.location.href = oauthUrl
     }
   }

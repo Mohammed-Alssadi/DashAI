@@ -1,25 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { Store, ArrowLeft } from "lucide-react"
-
-interface SallaConnectButtonProps {
-  onClick?: () => void
-}
+import { toast } from "sonner"
 
 // بناء رابط OAuth الحقيقي لمنصة سلة
-// ملاحظة: redirect_uri يشير دائماً لـ Supabase Edge Function (عام ودائماً HTTPS)
-// وليس للفرونت إند — لذا لا حاجة لـ ngrok أو baseUrl
+// redirect_uri يشير دائماً لـ Supabase Edge Function (عام ودائماً HTTPS)
 function buildSallaOAuthUrl(): string {
   const clientId = import.meta.env.VITE_SALLA_CLIENT_ID
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
-  // إذا المفتاح غير موجود → وضع المعاينة التجريبية
+  // إذا المفتاح غير موجود → وضع المعاينة
   if (!clientId || clientId === "PASTE_YOUR_SALLA_CLIENT_ID_HERE") {
-    return "/dashboard?demo=salla"
+    return ""
   }
 
   const params = new URLSearchParams({
     client_id: clientId,
-    // redirect_uri يشير لـ Supabase Edge Function — عام وجاهز دائماً
     redirect_uri: `${supabaseUrl}/functions/v1/salla-callback`,
     response_type: "code",
     scope: "offline_access",
@@ -28,13 +23,13 @@ function buildSallaOAuthUrl(): string {
   return `https://accounts.salla.sa/oauth2/auth?${params.toString()}`
 }
 
-export function SallaConnectButton({ onClick }: SallaConnectButtonProps) {
+export function SallaConnectButton() {
   const oauthUrl = buildSallaOAuthUrl()
-  const isDemoMode = oauthUrl.startsWith("/dashboard")
+  const isDemoMode = !oauthUrl
 
   const handleClick = () => {
     if (isDemoMode) {
-      onClick?.()
+      toast.error("يرجى إنشاء تطبيق في شركاء سلة وضبط مفتاح Client ID في ملف .env للربط الحقيقي.")
     } else {
       window.location.href = oauthUrl
     }

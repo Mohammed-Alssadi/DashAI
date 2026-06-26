@@ -44,12 +44,10 @@ export const dashboardService = {
         params: { store_id: storeId },
       })
       return response.data
-    } catch (error) {
-      console.warn(
-        "⚠️ فشل الاتصال بالـ Edge Function، العودة للبيانات التجريبية:",
-        error
-      )
-      return DEMO_DATA[demoPlatform === "zid" ? "zid" : "salla"]
+    } catch (error: any) {
+      console.error("❌ فشل جلب بيانات المتجر من الـ Edge Function:", error)
+      const errorMessage = error?.response?.data?.message || error?.response?.data?.error || error?.message || "فشل الاتصال بالخادم وجلب بيانات المتجر."
+      throw new Error(errorMessage)
     }
   },
 }
