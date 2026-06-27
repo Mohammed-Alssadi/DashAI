@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect, useState } from "react"
-import { useSearchParams, Link } from "react-router-dom"
+import { useNavigate, useSearchParams, Link } from "react-router-dom"
 import { toast } from "sonner"
 import { useDashboardStore } from "../store/storeInfoStore"
 import {
@@ -36,6 +36,7 @@ import {
 
 
 export function DashboardPage() {
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const storeId = searchParams.get("store_id") ?? undefined
   const demoPlatform = searchParams.get("demo") ?? searchParams.get("platform") ?? undefined

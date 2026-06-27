@@ -34,6 +34,10 @@ import {
   Link2,
   Plus,
   ArrowRight,
+  MoreVertical,
+  CircleUser,
+  CreditCard,
+  Bell,
 } from "lucide-react"
 
 export function DashboardLayout() {
