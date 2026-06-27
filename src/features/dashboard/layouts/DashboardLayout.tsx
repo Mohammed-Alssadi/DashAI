@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { Link, useNavigate, useSearchParams, Outlet } from "react-router-dom"
+import { Link, useSearchParams, Outlet } from "react-router-dom"
 import { toast } from "sonner"
 import { useAuth } from "@/features/auth"
 import { useDashboardStore } from "../store/storeInfoStore"
@@ -28,22 +28,15 @@ import {
   SidebarGroupContent,
 } from "@/components/ui/sidebar"
 import {
-  Package2,
-  Search,
   Store,
   LogOut,
   Home,
   Link2,
   Plus,
   ArrowRight,
-  MoreVertical,
-  CircleUser,
-  CreditCard,
-  Bell
 } from "lucide-react"
 
 export function DashboardLayout() {
-  const navigate = useNavigate()
   const { handleLogout } = useAuth()
   const [searchParams] = useSearchParams()
   const storeId = searchParams.get("store_id") ?? undefined
