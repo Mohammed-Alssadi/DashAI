@@ -11,8 +11,8 @@ const WelcomePage = lazy(() =>
 const ConnectPage = lazy(() =>
   import("@/features/connect").then((module) => ({ default: module.ConnectPage }))
 )
-const TestDashboard = lazy(() =>
-  import("@/features/dashboard").then((module) => ({ default: module.TestDashboard }))
+const DashboardPage = lazy(() =>
+  import("@/features/dashboard").then((module) => ({ default: module.DashboardPage }))
 )
 const LoginPage = lazy(() =>
   import("@/features/auth").then((module) => ({ default: module.LoginPage }))
@@ -62,7 +62,7 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element: (
           <Suspense fallback={<PageLoader />}>
-            <TestDashboard />
+            <DashboardPage />
           </Suspense>
         ),
       },
