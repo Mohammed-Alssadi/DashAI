@@ -14,6 +14,9 @@ const ConnectPage = lazy(() =>
 const DashboardPage = lazy(() =>
   import("@/features/dashboard").then((module) => ({ default: module.DashboardPage }))
 )
+const DashboardLayout = lazy(() =>
+  import("@/features/dashboard").then((module) => ({ default: module.DashboardLayout }))
+)
 const LoginPage = lazy(() =>
   import("@/features/auth").then((module) => ({ default: module.LoginPage }))
 )
@@ -51,20 +54,29 @@ const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/connect",
         element: (
           <Suspense fallback={<PageLoader />}>
-            <ConnectPage />
+            <DashboardLayout />
           </Suspense>
         ),
-      },
-      {
-        path: "/dashboard",
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <DashboardPage />
-          </Suspense>
-        ),
+        children: [
+          {
+            path: "/connect",
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <ConnectPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "/dashboard",
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <DashboardPage />
+              </Suspense>
+            ),
+          },
+        ],
       },
     ],
   },
