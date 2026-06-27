@@ -3,17 +3,14 @@ import { Link, useNavigate, useSearchParams, Outlet } from "react-router-dom"
 import { toast } from "sonner"
 import { useAuth } from "@/features/auth"
 import { useDashboardStore } from "../store/storeInfoStore"
-import { dashboardService, type StoreDetails } from "../services/dashboardService"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -35,7 +32,6 @@ import {
   Search,
   Store,
   LogOut,
-  ChevronsUpDown,
   Home,
   Link2,
   Plus,

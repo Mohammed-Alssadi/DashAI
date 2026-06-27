@@ -5,7 +5,6 @@ import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams, Link } from "react-router-dom"
 import { toast } from "sonner"
 import { useDashboardStore } from "../store/storeInfoStore"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Dialog,
   DialogContent,
@@ -16,13 +15,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
   Table,
   TableBody,
   TableCell,
@@ -31,17 +23,13 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import {
-  Activity,
   ArrowUpRight,
-  CreditCard,
-  DollarSign,
   Store,
   RefreshCw,
   AlertCircle,
   ExternalLink,
   ChevronLeft,
   Wrench,
-  Users,
   Link2Off,
   X
 } from "lucide-react"
