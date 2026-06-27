@@ -24,11 +24,17 @@ export function ZidConnectButton() {
       const clientId = import.meta.env.VITE_ZID_CLIENT_ID
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
+      // نرسل معرف المستخدم وحالة اللوكل في سلسلة نصية قصيرة لتفادي كراش خادم زد بسبب طول الـ state (الحد الأقصى)
+      const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      const isLocal = isLocalHost ? "1" : "0"
+      const state = `${session.user.id}:${isLocal}`
+
       const params = new URLSearchParams({
         client_id: clientId,
         redirect_uri: `${supabaseUrl}/functions/v1/zid-callback`,
         response_type: "code",
-        state: session.user.id, // تمرير معرف المستخدم كمعلمة للحالة
+        state: state,
+        // prompt: "login",
       })
 
       window.location.href = `https://oauth.zid.sa/oauth/authorize?${params.toString()}`

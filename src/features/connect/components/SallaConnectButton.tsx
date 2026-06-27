@@ -24,12 +24,17 @@ export function SallaConnectButton() {
       const clientId = import.meta.env.VITE_SALLA_CLIENT_ID
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 
+      // نرسل معرف المستخدم وحالة اللوكل في سلسلة نصية قصيرة لتفادي كراش خادم سلة بسبب طول الـ state
+      const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      const isLocal = isLocalHost ? "1" : "0"
+      const state = `${session.user.id}:${isLocal}`
+
       const params = new URLSearchParams({
         client_id: clientId,
         redirect_uri: `${supabaseUrl}/functions/v1/salla-callback`,
         response_type: "code",
         scope: "offline_access",
-        state: session.user.id, // تمرير معرف المستخدم كمعلمة للحالة
+        state: state,
       })
 
       window.location.href = `https://accounts.salla.sa/oauth2/auth?${params.toString()}`
